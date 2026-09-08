@@ -9,3 +9,5 @@ export const gameOverAtom = atom(false);
 export const winnerAtom = atom("");
 
 export const difficultAtom = atom("normal");
+
+export const gameModeAtom = atom("1p");

@@ -7,6 +7,7 @@ import {
     gameOverAtom,
     winnerAtom,
     difficultAtom,
+    gameModeAtom,
 } from "../atoms/gameAtoms";
 
 const store = getDefaultStore();
@@ -235,6 +236,8 @@ export class PongScene extends Phaser.Scene {
         this.ultimaVelocidadeY = this.ball.body.velocity.y;
     }
 
+
+    
     getVelocidadeIA(){
         const dificuldade = 
             store.get(difficultAtom);
@@ -264,47 +267,93 @@ export class PongScene extends Phaser.Scene {
         this.player.body.setVelocityY(0);
 
         // Movimento para cima
-        if (
-            this.teclas.cima.isDown ||
-            this.cursores.up.isDown
-        ){
+        if (this.teclas.cima.isDown) {
+
             this.player.body.setVelocityY(-350);
         }
 
         // Movimento para baixo
-        else if (
-            this.teclas.baixo.isDown ||
-            this.cursores.down.isDown
-        ){
+        else if (this.teclas.baixo.isDown){
+            
             this.player.body.setVelocityY(350);
         }
 
         
         // ============================
-        // Computador - IA
-        // ============================
+// PLAYER 2 / COMPUTADOR
+// ============================
 
-        const velocidadeIA = 
+const modo = store.get(gameModeAtom);
+
+console.log("Modo atual:", modo);
+
+// SEMPRE zera a velocidade primeiro
+this.computer.body.setVelocityY(0);
+
+
+// ============================
+// MODO 2 JOGADORES
+// ============================
+
+if (modo === "2p") {
+
+    if (this.cursores.up.isDown) {
+
+        this.computer.body.setVelocityY(-350);
+
+    }
+
+    else if (this.cursores.down.isDown) {
+
+        this.computer.body.setVelocityY(350);
+
+    }
+
+    // IMPORTANTE:
+    // sai do bloco da IA
+    // nenhuma IA é executada aqui
+}
+
+
+// ============================
+// MODO 1 JOGADOR
+// ============================
+
+else {
+
+    const velocidadeIA =
         this.getVelocidadeIA();
 
-        // Bola está acima da raquete
-        if (this.ball.y < this.computer.y -10){
+
+    if (this.ball.body.velocity.x > 0) {
+
+        if (
+            this.ball.y <
+            this.computer.y - 10
+        ) {
+
             this.computer.body.setVelocityY(
                 -velocidadeIA
             );
+
         }
 
-        // Bola está abaixo da raquete
-        else if (this.ball.y > this.computer.y + 10){
+        else if (
+            this.ball.y >
+            this.computer.y + 10
+        ) {
+
             this.computer.body.setVelocityY(
                 velocidadeIA
             );
+
         }
 
-        // Bola está aproximadamente alinhada
-        else{
-            this.computer.body.setVelocityY(0);
-        }
+    }
+
+}
+        
+        
 
         // ============================
         // Sistema de pontos
@@ -359,25 +408,31 @@ export class PongScene extends Phaser.Scene {
 
     // Ponto computador
     pontoComputador(){
+      
         somPonto.play();
 
         const pontosAtuais = 
         store.get(computerScoreAtom);
 
         const novosPontos = 
-        pontosAtuais + 1;
-    
+        pontosAtuais + 1;  
+
         store.set(
             computerScoreAtom,
             novosPontos
         );
 
+        
         if (novosPontos >= 5){
-            somVitoria.play();
+            
+            const modo = 
+            store.get(gameModeAtom);
 
             store.set(
                 winnerAtom,
-                "Computador"
+                modo === "2p"
+                ? "Jogador 2"
+                : "Computador"
             );
 
             store.set(
@@ -385,7 +440,10 @@ export class PongScene extends Phaser.Scene {
                 true
             );
 
+            somVitoria.play();
+
             this.pararJogo();
+            
             return;
         }
 
@@ -476,3 +534,8 @@ rebaterNaRaquete(raquete, direcao) {
 }
 
 }
+
+
+
+
+

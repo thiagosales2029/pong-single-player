@@ -10,9 +10,14 @@ import {
   playerScoreAtom,
   computerScoreAtom,
   winnerAtom,
+  gameModeAtom,
 } from "../atoms/gameAtoms";
 
 function StartMenu() {
+
+  const[gameMode, setGameMode] =
+  useAtom(gameModeAtom);
+
   const [difficult, setDifficulty] =
     useAtom(difficultAtom);
 
@@ -47,9 +52,44 @@ function StartMenu() {
 
       <h2>PONG</h2>
 
-      <p>Escolha a dificuldade</p>
+      <p>Modo de jogo</p>
 
-      <div className="difficulty-buttons">
+      <div className="mode-buttons">
+
+      <button className={
+        gameMode === "1p"
+        ? "selected"
+        : ""
+      }
+      onClick={() =>
+        setGameMode("1p")
+      }
+
+      >
+        1 Jogador
+      </button>
+
+      <button className={
+        gameMode === "2p"
+        ? "selected"
+        : ""
+      }
+      onClick={() =>
+        setGameMode("2p")
+      }
+      >
+        2 Jogadores
+      </button>
+      </div>
+
+
+
+    {gameMode === "1p" && (
+
+    <>
+        <p>Escolha a dificuldade</p>
+
+        <div className="difficulty-buttons">
 
         <button
           className={
@@ -89,10 +129,14 @@ function StartMenu() {
         >
           Difícil
         </button>
+      </div>  
+        
+     </>
 
-      </div>
+    )}
 
-      <button
+      
+    <button
         className="start-button"
         onClick={iniciarJogo}
       >
